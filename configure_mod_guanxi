@@ -14,3 +14,6 @@ export CXXFLAGS="-g -I/Users/alistair/apps/apr/include/apr-1 -I/Users/alistair/s
 # ~/apps/httpd-2.2.8/bin/apxs -i -a -n mod_guanxi libmodguanxi.la
 # apps/httpd-2.2.8/modules, apps/httpd-2.2.8/conf/httpd.conf
 # ~/apps/httpd-2.2.8/bin/apachectl configtest
+
+# To debug:
+# httpd -X and attach to the process
