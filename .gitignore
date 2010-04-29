@@ -17,3 +17,7 @@ ltmain.sh
 missing
 mod_guanxi.lo
 mod_guanxi.o
+.dep.inc
+Makefile-mod_guanxi.mk
+conf3038.sh
+nbproject
