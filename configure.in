@@ -36,12 +36,67 @@ AC_DEFUN([APACHE_DIR],[
 
 ])
 
+AC_DEFUN([APR_DIR],[
+
+	AC_ARG_WITH(
+		apr,
+		[  --with-apr[=DIR]     apr directory],
+		,
+		[with_apr="no"]
+	)
+
+	AC_MSG_CHECKING(for apr directory)
+
+	if test "$with_apr" = "no"; then
+		AC_MSG_ERROR( You need to specify the apr directory using --with-apr)
+	else
+		# make sure that a well known include file exists
+		if test -e $with_apr/include/apr-1/apr.h; then
+			apr_dir=$with_apr
+			AC_MSG_RESULT(APR found!)
+		else
+			AC_MSG_ERROR( $with_apr not found.  Check the value you specified with --with-apr)
+		fi
+	fi
+
+])
+
+AC_DEFUN([APR_UTIL_DIR],[
+
+	AC_ARG_WITH(
+		apr-util,
+		[  --with-apr-util[=DIR]     apr-util directory],
+		,
+		[with_apr_util="no"]
+	)
+
+	AC_MSG_CHECKING(for apr-util directory)
+
+	if test "$with_apr_util" = "no"; then
+		AC_MSG_ERROR( You need to specify the apr-util directory using --with-apr-util)
+	else
+		# make sure that a well known include file exists
+		if test -e $with_apr_util/include/apr_hooks.h; then
+			apr_util_dir=$with_apr_util
+			AC_MSG_RESULT(APR-UTIL found!)
+		else
+			AC_MSG_ERROR( $with_apr_util not found.  Check the value you specified with --with-apr-util)
+		fi
+	fi
+
+])
+
+
 # Now call the APACHE_DIR macro that was just specified
 APACHE_DIR
+APR_DIR
+APR_UTIL_DIR
 
 # Save the location of apache into the "apache_dir" variable.
 # The AC_SUBST macro causes the variable to be saved in config.status
 AC_SUBST(apache_dir)
+AC_SUBST(apr_dir)
+AC_SUBST(apr_util_dir)
 
 # Write config.status and the Makefile
 AC_OUTPUT(Makefile)
