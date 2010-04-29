@@ -7,8 +7,12 @@
 # ./configure --with-apr=/Users/alistair/apps/apr
 # make
 
-export CXXFLAGS="-g -I/Users/alistair/apps/apr/include/apr-1 -I/Users/alistair/src/httpd-2.2.8/srclib/apr-util/include"
-./configure --with-apache=/Users/alistair/apps/httpd-2.2.8
+#export CXXFLAGS="-g -I/Users/alistair/apps/apr/include/apr-1 -I/Users/alistair/src/httpd-2.2.8/srclib/apr-util/include"
+#./configure --with-apache=/Users/alistair/apps/httpd-2.2.8
+
+./configure --with-apache=/Users/alistair/apps/httpd-2.2.8 \
+            --with-apr=/Users/alistair/apps/apr-1.3.3 \
+            --with-apr-util=/Users/alistair/src/httpd-2.2.8/srclib/apr-util
 
 # make
 # ~/apps/httpd-2.2.8/bin/apxs -i -a -n mod_guanxi libmodguanxi.la
