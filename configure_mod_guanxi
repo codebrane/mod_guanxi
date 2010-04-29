@@ -1,0 +1,19 @@
+# glibtoolize
+# aclocal
+# autoconf
+# automake -a
+
+# cd ~/src/httpd-2.2.8/srclib/apr-util
+# ./configure --with-apr=/Users/alistair/apps/apr
+# make
+
+#export CFLAGS="-I/Users/alistair/apps/apr/include/apr-1 -I/Users/alistair/src/httpd-2.2.8/srclib/apr-util/include"
+#export CPPFLAGS="-I/Users/alistair/apps/apr/include/apr-1 -I/Users/alistair/src/httpd-2.2.8/srclib/apr-util/include"
+export CXXFLAGS="-I/Users/alistair/apps/apr/include/apr-1 -I/Users/alistair/src/httpd-2.2.8/srclib/apr-util/include"
+#export CXX="g++ -m32"
+./configure --with-apache=/Users/alistair/apps/httpd-2.2.8
+
+# make
+# ~/apps/httpd-2.2.8/bin/apxs -i -a -n mod_guanxi libmodguanxi.la
+# apps/httpd-2.2.8/modules, apps/httpd-2.2.8/conf/httpd.conf
+# ~/apps/httpd-2.2.8/bin/apachectl configtest
