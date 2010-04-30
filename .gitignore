@@ -6,10 +6,7 @@
 config.log
 config.status
 Makefile
-Makefile.in
-aclocal.m4
 autom4te.cache
-configure
 libmodguanxi.la
 libtool
 mod_guanxi.lo
