@@ -15,7 +15,7 @@
             --with-apr-util=/Users/alistair/src/httpd-2.2.8/srclib/apr-util
 
 # make
-# ~/apps/httpd-2.2.8/bin/apxs -i -a -n mod_guanxi libmodguanxi.la
+# ~/apps/httpd-2.2.8/bin/apxs -i -a -n mod_guanxi src/libmodguanxi.la
 # apps/httpd-2.2.8/modules, apps/httpd-2.2.8/conf/httpd.conf
 # ~/apps/httpd-2.2.8/bin/apachectl configtest
 
