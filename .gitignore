@@ -3,6 +3,7 @@
 .settings
 .deps
 .libs
+Makefile
 config.log
 config.status
 autom4te.cache
