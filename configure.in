@@ -101,4 +101,5 @@ AC_SUBST(apr_dir)
 AC_SUBST(apr_util_dir)
 
 # Write config.status and the Makefile
-AC_OUTPUT(Makefile)
+#AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile src/Makefile)
