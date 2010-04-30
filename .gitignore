@@ -5,7 +5,6 @@
 .libs
 config.log
 config.status
-Makefile
 autom4te.cache
 libmodguanxi.la
 libtool
