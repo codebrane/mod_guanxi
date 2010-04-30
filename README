@@ -1,4 +1,50 @@
 Apache 2.2 Guanxi Guard Module
+==============================
 
-	A Guanxi Guard for Apache
+o Introduction
+o Requirements
+o Building
+o Installing
+o Configuring
+o More information
+
+Introduction
+------------
+mod_guanxi is an Apache module version of the Guanxi Guard. You can use it to protect
+sites on an Apache server using Shibboleth/SAML2 Profiles, in conjunction with a
+Guanxi Engine. It provides a lightweight way of using Shibboleth/SAML2 on multiple
+Apache servers, with the central Guanxi Engine taking care of all SAML and federation
+communication and security.
+
+Requirements
+------------
+mod_guanxi needs these:
+  - apr http://apr.apache.org/
+  - apr-util http://apr.apache.org/
+
+Building
+--------
+Adjust the paths in configure_mod_guanxi
+./configure_mod_guanxi
+make
+If you get build errors, try configuring/building from scratch:
+libtoolize, or glibtoolize if you're on OS X
+aclocal
+autoconf
+automake -a
+./configure_mod_guanxi
+make
+
+Installing
+----------
+PATH_TO_AXPS -i -a -n mod_guanxi src/libmodguanxi.la
+
+Configuring
+-----------
+TBD
+
+More information
+----------------
+http://codebrane.com/blog/?cat=2
+http://www.guanxi.uhi.ac.uk
 
