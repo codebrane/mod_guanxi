@@ -3,6 +3,8 @@
 .settings
 .deps
 .libs
+config.log
+config.status
 Makefile
 Makefile.in
 aclocal.m4
