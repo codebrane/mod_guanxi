@@ -7,14 +7,9 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
-config.*
 configure
-depcomp
-install-sh
 libmodguanxi.la
 libtool
-ltmain.sh
-missing
 mod_guanxi.lo
 mod_guanxi.o
 .dep.inc
