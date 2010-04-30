@@ -1,6 +1,8 @@
 # Required initializer
 AC_INIT
 
+AC_CONFIG_AUX_DIR(build)
+
 # Automake initialization
 AM_INIT_AUTOMAKE(mod_guanxi, 1.0)
 
