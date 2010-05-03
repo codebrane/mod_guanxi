@@ -9,8 +9,8 @@ config.status
 autom4te.cache
 libmodguanxi.la
 libtool
-mod_guanxi.lo
-mod_guanxi.o
+*.lo
+*.o
 .dep.inc
 Makefile-mod_guanxi.mk
 conf3038.sh
