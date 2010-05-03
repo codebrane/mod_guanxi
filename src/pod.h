@@ -15,7 +15,7 @@ using namespace std;
 class Pod {
 public:
 	/// Default constructor
-	Pod(string pod_session_id);
+	Pod(string podSessionID);
 
 	/// Default destructor
 	virtual ~Pod();
@@ -26,7 +26,7 @@ public:
 	 * in their security context
 	 * \param saml_response The SAML Response containing the attributes
 	 */
-	void set_saml_response(string saml_response);
+	void setSAMLResponse(string samlResponse);
 
 	/// Stores the attributes sent from the Guanxi SAML Engine
 	/**
@@ -34,14 +34,14 @@ public:
 	 * attributes in an easily accessible format
 	 * \param json The JSON from the Guanxi SAML Engine containing the attributes
 	 */
-	void set_attributes(const char* json);
+	void setAttributes(const char* json);
 
 	/// Returns the session id this Pod is tied to
 	/**
 	 * Each Pod is tied to a particular session id. This gets it
 	 * \return the session id of the Pod
 	 */
-	string get_session_id(void);
+	string getSessionID(void);
 
 	/// Returns the original SAML Response containing the attributes
 	/**
@@ -49,13 +49,13 @@ public:
 	 * in their security context
 	 * \return the original SAML Response as string version of the XML
 	 */
-	string get_saml_response(void);
+	string getSAMLResponse(void);
 
 private:
 	/// The session id of the Pod
-	string session_id;
+	string sessionID;
 	/// The SAML Response containing the attributes in their security context
-	string saml_response;
+	string samlResponse;
 };
 
 #endif /* POD_H_ */
