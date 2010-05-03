@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "httpd.h"
+
 using namespace std;
 
 /// Utility class
@@ -19,7 +21,9 @@ public:
 	 * This can be used to generate session ids for Pods
 	 * \return a uuid
 	 */
-	static string generate_uuid(void);
+	static string generateUUID(void);
+
+	static const char* getCookieValue(request_rec* request, const char* cookie_name);
 };
 
 #endif /* UTIL_H_ */
