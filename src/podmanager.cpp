@@ -6,16 +6,16 @@ PodManager::PodManager() {
 PodManager::~PodManager() {
 }
 
-void PodManager::add_pod(string session_id) {
-	Pod* pod = new Pod(session_id);
+void PodManager::addPod(string sessionID) {
+	Pod* pod = new Pod(sessionID);
 	pods.push_back(pod);
 }
 
-Pod* PodManager::get_pod(string session_id) {
+Pod* PodManager::getPod(string sessionID) {
 	vector<Pod*>::const_iterator iterator;
 
 	for (iterator = pods.begin(); iterator != pods.end(); iterator++) {
-		if (((Pod*)(*iterator))->get_session_id() == session_id) {
+		if (((Pod*)(*iterator))->getSessionID() == sessionID) {
 			return ((Pod*)(*iterator));
 		}
 	}
