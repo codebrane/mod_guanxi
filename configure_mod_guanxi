@@ -1,3 +1,4 @@
+export CXXFLAGS="-g"
 ./configure --with-apache=/Users/alistair/apps/httpd-2.2.8 \
             --with-apr=/Users/alistair/apps/apr-1.3.3 \
             --with-apr-util=/Users/alistair/src/httpd-2.2.8/srclib/apr-util
