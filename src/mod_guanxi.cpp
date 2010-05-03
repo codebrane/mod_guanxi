@@ -2,14 +2,17 @@
 #include "http_config.h"
 #include "apr_strings.h"
 
+#include "util.h"
+#include "podmanager.h"
+
 extern "C" module AP_MODULE_DECLARE_DATA mod_guanxi_module;
 
 struct mod_guanxi_config {
-	char* cookie_prefix;
-	char* verifier_url;
-	char* attribute_consumer_url;
-	char* podder_url;
-	apr_table_t* pods;
+	char* cookiePrefix;
+	char* verifierURL;
+	char* attributeConsumerURL;
+	char* podderURL;
+	PodManager* podManager;
 };
 
 static int cookies_callback(void* data, const char* key, const char* value)
@@ -22,12 +25,33 @@ static int cookies_callback(void* data, const char* key, const char* value)
 
 static int mod_guanxi_method_handler(request_rec* r)
 {
+	mod_guanxi_config* gxConfig = (mod_guanxi_config*)ap_get_module_config(r->server->module_config, &mod_guanxi_module);
+
+	const char* cookieValue = Util::getCookieValue(r, gxConfig->cookiePrefix);
+	if (cookieValue == NULL) {
+		apr_table_setn(r->headers_out, "Location", "http://codebrane.com/blog");
+		return HTTP_TEMPORARY_REDIRECT;
+	}
+
 	char szMessage[255];
 	strcpy(szMessage, "GX:");
 	strcat(szMessage, r->the_request);
 	strcat(szMessage, "\n");
+	strcat(szMessage, r->uri);
+	strcat(szMessage, "\n");
 	fprintf(stderr, szMessage);
 	fflush(stderr);
+
+	fprintf(stderr, "PODS START ----------------------------\n");
+	string s = Util::generateUUID();
+	fprintf(stderr, s.c_str());
+	fflush(stderr);
+	gxConfig->podManager->addPod(s);
+	Pod* pod = gxConfig->podManager->getPod(s);
+	fprintf(stderr, pod->getSessionID().c_str());
+	fprintf(stderr, "PODS END ----------------------------\n");
+	fflush(stderr);
+
 
 	apr_table_setn(r->headers_out, "Location", "http://codebrane.com/blog");
 
@@ -43,18 +67,17 @@ static int mod_guanxi_method_handler(request_rec* r)
 	fprintf(stderr, "----------------------------\n");
 	fflush(stderr);
 
-	mod_guanxi_config *cfg = (mod_guanxi_config*)ap_get_module_config(r->server->module_config, &mod_guanxi_module);
 	fprintf(stderr,"GuanxiGuardVerifierURL = ");
-	fprintf(stderr, cfg->verifier_url);
+	fprintf(stderr, gxConfig->verifierURL);
 	fprintf(stderr,"\n");
 	fprintf(stderr,"GuanxiGuardAttributeConsumerURL = ");
-	fprintf(stderr, cfg->attribute_consumer_url);
+	fprintf(stderr, gxConfig->attributeConsumerURL);
 	fprintf(stderr,"\n");
 	fprintf(stderr,"GuaxniGuardPodderURL = ");
-	fprintf(stderr, cfg->podder_url);
+	fprintf(stderr, gxConfig->podderURL);
 	fprintf(stderr,"\n");
 	fprintf(stderr,"GuaxniGuardCookiePrefix = ");
-	fprintf(stderr, cfg->cookie_prefix);
+	fprintf(stderr, gxConfig->cookiePrefix);
 	fprintf(stderr,"\n");
 	fflush(stderr);
 
@@ -71,39 +94,39 @@ static void mod_guanxi_register_hooks(apr_pool_t* p)
 
 static void *create_mod_guanxi_config(apr_pool_t* p, server_rec* s)
 {
-	mod_guanxi_config* pConfig = (mod_guanxi_config *)apr_pcalloc(p, sizeof(mod_guanxi_config));
-	pConfig->pods = apr_table_make(p, 0);
+	mod_guanxi_config* gxConfig = (mod_guanxi_config *)apr_pcalloc(p, sizeof(mod_guanxi_config));
+	gxConfig->podManager = new PodManager();
 
-	return (void*)pConfig;
+	return (void*)gxConfig;
 }
 
 // --------------------------------------------------------------------------------------------------------
 // Configuration Setters
 const char* set_cookie_prefix(cmd_parms* parms, void* mconfig, const char* arg)
 {
-	mod_guanxi_config *pConfig = (mod_guanxi_config*)ap_get_module_config(parms->server->module_config, &mod_guanxi_module);
-	pConfig->cookie_prefix = (char *)arg;
+	mod_guanxi_config* gxConfig = (mod_guanxi_config*)ap_get_module_config(parms->server->module_config, &mod_guanxi_module);
+	gxConfig->cookiePrefix = (char *)arg;
 	return NULL;
 }
 
 const char* set_verifier_url(cmd_parms* parms, void* mconfig, const char* arg)
 {
-	mod_guanxi_config *pConfig = (mod_guanxi_config*)ap_get_module_config(parms->server->module_config, &mod_guanxi_module);
-	pConfig->verifier_url = (char *)arg;
+	mod_guanxi_config* gxConfig = (mod_guanxi_config*)ap_get_module_config(parms->server->module_config, &mod_guanxi_module);
+	gxConfig->verifierURL = (char *)arg;
 	return NULL;
 }
 
 const char* set_attribute_consumer_url(cmd_parms* parms, void* mconfig, const char* arg)
 {
-	mod_guanxi_config *pConfig = (mod_guanxi_config*)ap_get_module_config(parms->server->module_config, &mod_guanxi_module);
-	pConfig->attribute_consumer_url = (char *)arg;
+	mod_guanxi_config* gxConfig = (mod_guanxi_config*)ap_get_module_config(parms->server->module_config, &mod_guanxi_module);
+	gxConfig->attributeConsumerURL = (char *)arg;
 	return NULL;
 }
 
 const char* set_podder_url(cmd_parms* parms, void* mconfig, const char* arg)
 {
-	mod_guanxi_config *pConfig = (mod_guanxi_config*)ap_get_module_config(parms->server->module_config, &mod_guanxi_module);
-	pConfig->podder_url = (char *)arg;
+	mod_guanxi_config* gxConfig = (mod_guanxi_config*)ap_get_module_config(parms->server->module_config, &mod_guanxi_module);
+	gxConfig->podderURL = (char *)arg;
 	return NULL;
 }
 // --------------------------------------------------------------------------------------------------------
@@ -133,10 +156,10 @@ static const command_rec mod_guanxi_cmds[] =
 module AP_MODULE_DECLARE_DATA mod_guanxi_module =
 {
 	STANDARD20_MODULE_STUFF,
-	NULL,
-	NULL,
-	create_mod_guanxi_config,
-	NULL,
-	mod_guanxi_cmds,
-	mod_guanxi_register_hooks
+	NULL, // create_dir_config
+	NULL, // merge_dir_config
+	create_mod_guanxi_config, // create_server_config
+	NULL, // merge_server_config
+	mod_guanxi_cmds, // cmds
+	mod_guanxi_register_hooks // register_hooks
 };
