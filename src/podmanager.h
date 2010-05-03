@@ -26,16 +26,16 @@ public:
 
 	/// Instructs the PodManager to add a new Pod tied to the specified session id
 	/**
-	 * \param session_id the cookie value which should be unique among the Pods
+	 * \param sessionID the cookie value which should be unique among the Pods
 	 */
-	void add_pod(string session_id);
+	void addPod(string sessionID);
 
 	/// Retrieves a Pod tied to the specified session id or NULL if it doesn't exist
 	/**
 	 * \param session_id the cookie value which should be unique among the Pods
 	 * \return the Pod for the session id or NULL if one doesn't exist
 	 */
-	Pod* get_pod(string session_id);
+	Pod* getPod(string sessionID);
 
 private:
 	/// Internal list of Pods
