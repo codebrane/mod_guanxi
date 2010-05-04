@@ -23,7 +23,22 @@ public:
 	 */
 	static string generateUUID(void);
 
-	static const char* getCookieValue(request_rec* request, const char* cookie_name);
+	/// Retrieves the name of the service being accessed
+	/**
+	 * Retrieves the last part of the request uri
+	 * \param uri the request uri e.g. /test/testservice
+	 * \return the last part of the request uri e.g. testservice
+	 */
+	static const char* getServiceName(char* uri);
+
+	/// Gets the value of a request parameter
+	/**
+	 * Retrieves the value of a parameter from the request
+	 * \param paramName the name of the parameter who's value you want
+	 * \param the query string from the request
+	 * \return the value of the parameter or NULL if the param doesn't exist
+	 */
+	static const char* getRequestParam(const char* paramName, const char* params);
 };
 
 #endif /* UTIL_H_ */
