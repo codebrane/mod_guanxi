@@ -1,3 +1,10 @@
+/// mod_guanxi The Guanxi Guard Apache Module
+/**
+ * Guanxi Guard Apache Module
+ *
+ * \author alistair
+ */
+
 #include "httpd.h"
 #include "http_config.h"
 #include "http_protocol.h"
@@ -6,6 +13,7 @@
 
 #include "util.h"
 #include "podmanager.h"
+#include "attributeconsumerservice.h"
 
 /// Large enough buffer to hold either the cookie name or its value when looking for the cookie
 #define COOKIE_NAME_OR_VALUE_BUFFER_SIZE 100
@@ -24,6 +32,7 @@ struct mod_guanxi_config {
 	char* podderURL;
 	char* engineGPSURL;
 	PodManager* podManager;
+	AttributeConsumerService* attributeConsumerService;
 };
 
 int cookiesCallback(void* data, const char* key, const char* value) {
@@ -46,11 +55,9 @@ static int mod_guanxi_method_handler(request_rec* r)
 {
 	mod_guanxi_config* gxConfig = (mod_guanxi_config*)ap_get_module_config(r->server->module_config, &mod_guanxi_module);
 
-	// Look for our cookie
-	char cookieNameOrValue[COOKIE_NAME_OR_VALUE_BUFFER_SIZE];
-	strcpy(cookieNameOrValue, gxConfig->cookiePrefix);
-	apr_table_do(cookiesCallback, (void*)cookieNameOrValue, r->headers_in, NULL);
-
+	// ////////////////////////////////////////////////////////////////////////////////
+	// Guard Services
+	// ////////////////////////////////////////////////////////////////////////////////
 	const char* service = Util::getServiceName(r->uri);
 	if (service != NULL) {
 		fprintf(stderr, "SERVICE = %s\n", service);
@@ -62,9 +69,9 @@ static int mod_guanxi_method_handler(request_rec* r)
 		if (strcmp(service, gxConfig->verifierURL) == 0) {
 			r->content_type = "text/plain";
 
-			const char* sessionid = Util::getRequestParam((const char*)"sessionid", (const char*)r->args);
-			if (sessionid != NULL) {
-				if (gxConfig->podManager->getPod(sessionid) != NULL) {
+			const char* sessionID = Util::getRequestParam((const char*)"sessionid", (const char*)r->args);
+			if (sessionID != NULL) {
+				if (gxConfig->podManager->hasPod(sessionID)) {
 					ap_rputs(ENGINE_SESSION_VERIFIED, r);
 				}
 				else {
@@ -76,15 +83,40 @@ static int mod_guanxi_method_handler(request_rec* r)
 			}
 
 			return OK;
-		} // if (strcmp(service, gxConfig->verifierURL) == 0)
+		}
+
+		// Attribute Consumer Service
+		if (strcmp(service, gxConfig->attributeConsumerURL) == 0) {
+			r->content_type = "text/plain";
+			ap_rputs("OK", r);
+			return OK;
+		}
+
+		// Podder Service
+		if (strcmp(service, gxConfig->podderURL) == 0) {
+			const char* sessionID = Util::getRequestParam((const char*)"id", (const char*)r->args);
+			Pod* pod = gxConfig->podManager->getPod(sessionID);
+			apr_table_set(r->err_headers_out, "Location", pod->getURI().c_str());
+			return HTTP_TEMPORARY_REDIRECT;
+		}
 	} // if (service != NULL)
+	// ////////////////////////////////////////////////////////////////////////////////
 
+	// Not a Guard service so we've either finished the SAML round trip or we need to start one
 
-	// If we didn't find the cookie we need to start a new session with the Engine
-	if (strcmp(cookieNameOrValue, gxConfig->cookiePrefix) == 0) {
-		// Create a new Pod for the session
-		string sessionid = Util::generateUUID();
-		gxConfig->podManager->addPod(sessionid);
+	// Look for our cookie
+	char cookieNameOrValue[COOKIE_NAME_OR_VALUE_BUFFER_SIZE];
+	strcpy(cookieNameOrValue, gxConfig->cookiePrefix);
+	strcat(cookieNameOrValue, gxConfig->entityID);
+	apr_table_do(cookiesCallback, (void*)cookieNameOrValue, r->headers_in, NULL);
+
+	/* If we didn't find the cookie or there's no pod for the cookie
+	 * we need to start a new session with the Engine
+	 */
+	if ((strtok(cookieNameOrValue, gxConfig->cookiePrefix) == NULL) ||
+			(!gxConfig->podManager->hasPod(cookieNameOrValue))) {
+		// Create a new session
+		string sessionID = Util::generateUUID();
 
 		// Redirect to the Engine's GPS service
 		char gpsService[255];
@@ -92,15 +124,24 @@ static int mod_guanxi_method_handler(request_rec* r)
 		strcat(gpsService, "?guardid=");
 		strcat(gpsService, gxConfig->entityID);
 		strcat(gpsService, "&sessionid=");
-		strcat(gpsService, sessionid.c_str());
+		strcat(gpsService, sessionID.c_str());
 		apr_table_set(r->headers_out, "Location", gpsService);
 
+		// Create a new Pod
+		Pod* pod = gxConfig->podManager->addPod(sessionID);
+		pod->setURI(string(r->uri));
+
+		/* Create the new cookie tied to the new Pod. Need to use err_headers_out
+		 * as headers_out only gets sent on 2XX responses.
+		 */
+		char* cookie = apr_psprintf(r->pool, "%s%s=%s; path=/; domain=%s", gxConfig->cookiePrefix, gxConfig->entityID, sessionID.c_str(), "sgarbh.smo.uhi.ac.uk");
+		apr_table_add(r->err_headers_out, "Set-Cookie", cookie);
+
+		// Redirecting to the Engine's GPS service
 		return HTTP_TEMPORARY_REDIRECT;
 	}
 
-
-	//char* cookie = apr_psprintf(r->pool, "%s=%s; path=/", "__GX", "test");
-	//apr_table_add(r->headers_out, "Set-Cookie", cookie);
+	// We now have a cookie with a Pod
 
 	return OK;
 }
@@ -114,6 +155,7 @@ static void *create_mod_guanxi_config(apr_pool_t* p, server_rec* s)
 {
 	mod_guanxi_config* gxConfig = (mod_guanxi_config *)apr_pcalloc(p, sizeof(mod_guanxi_config));
 	gxConfig->podManager = new PodManager();
+	gxConfig->attributeConsumerService = new AttributeConsumerService();
 
 	return (void*)gxConfig;
 }
