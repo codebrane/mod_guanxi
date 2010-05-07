@@ -28,14 +28,22 @@ public:
 	/**
 	 * \param sessionID the cookie value which should be unique among the Pods
 	 */
-	void addPod(string sessionID);
+	Pod* addPod(string sessionID);
 
 	/// Retrieves a Pod tied to the specified session id or NULL if it doesn't exist
 	/**
-	 * \param session_id the cookie value which should be unique among the Pods
+	 * \param sessionID the cookie value which should be unique among the Pods
 	 * \return the Pod for the session id or NULL if one doesn't exist
 	 */
 	Pod* getPod(string sessionID);
+
+	/// Determines whether a Pod with the specified session id exists
+	/**
+	 * Looks to see if a Pod has been registered with the specified session id
+	 * \param sessionID the cookie which is a suspected Pod
+	 * \return TRUE if a Pod exists for the session id otherwise FALSE
+	 */
+	bool hasPod(string sessionID);
 
 private:
 	/// Internal list of Pods
