@@ -51,11 +51,28 @@ public:
 	 */
 	string getSAMLResponse(void);
 
+	/// Gets the original URI that was requested
+	/**
+	 * This returns the original URI that the Pod was created for
+	 * e.g. /test/index.html
+	 * \return the uri
+	 */
+	string getURI(void);
+
+	/// Sets the URI for the Pod
+	/**
+	 * This is the original URI that was requested
+	 * \param uri the original URI
+	 */
+	void setURI(string uri);
+
 private:
 	/// The session id of the Pod
 	string sessionID;
 	/// The SAML Response containing the attributes in their security context
 	string samlResponse;
+	/// The original uri for which the Pod was created
+	string uri;
 };
 
 #endif /* POD_H_ */
