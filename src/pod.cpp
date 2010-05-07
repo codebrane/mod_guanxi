@@ -7,7 +7,7 @@ Pod::~Pod() {
 }
 
 string Pod::getSessionID(void) {
-	return sessionID.c_str();
+	return sessionID;
 }
 
 void Pod::setSAMLResponse(string samlResponse) {
@@ -15,8 +15,17 @@ void Pod::setSAMLResponse(string samlResponse) {
 }
 
 string Pod::getSAMLResponse(void) {
-	return sessionID.c_str();
+	return sessionID;
 }
 
 void Pod::setAttributes(const char* json) {
 }
+
+string Pod::getURI(void) {
+	return uri;
+}
+
+void Pod::setURI(string podURI) {
+	uri = podURI;
+}
+
