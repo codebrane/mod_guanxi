@@ -6,9 +6,10 @@ PodManager::PodManager() {
 PodManager::~PodManager() {
 }
 
-void PodManager::addPod(string sessionID) {
+Pod* PodManager::addPod(string sessionID) {
 	Pod* pod = new Pod(sessionID);
 	pods.push_back(pod);
+	return pod;
 }
 
 Pod* PodManager::getPod(string sessionID) {
@@ -21,4 +22,8 @@ Pod* PodManager::getPod(string sessionID) {
 	}
 
 	return NULL;
+}
+
+bool PodManager::hasPod(string sessionID) {
+	return (getPod(sessionID) != NULL);
 }
