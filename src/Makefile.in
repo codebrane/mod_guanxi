@@ -51,7 +51,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libmodguanxi_la_LIBADD =
 am_libmodguanxi_la_OBJECTS = mod_guanxi.lo podmanager.lo pod.lo \
-	util.lo attributeconsumerservice.lo
+	util.lo attributeconsumerservice.lo podderservice.lo
 libmodguanxi_la_OBJECTS = $(am_libmodguanxi_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build/depcomp
@@ -196,7 +196,13 @@ target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libmodguanxi.la
-libmodguanxi_la_SOURCES = mod_guanxi.cpp podmanager.h podmanager.cpp pod.h pod.cpp util.h util.cpp attributeconsumerservice.h attributeconsumerservice.cpp
+libmodguanxi_la_SOURCES = mod_guanxi.cpp \
+                          podmanager.h podmanager.cpp \
+                          pod.h pod.cpp\
+                          util.h util.cpp\
+                          attributeconsumerservice.h attributeconsumerservice.cpp \
+                          podderservice.h podderservice.cpp
+
 INCLUDES = -I@apache_dir@/include -I@apr_dir@/include/apr-1 -I@apr_util_dir@/include
 all: all-am
 
@@ -270,6 +276,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/attributeconsumerservice.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_guanxi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pod.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/podderservice.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/podmanager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Plo@am__quote@
 
