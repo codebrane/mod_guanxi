@@ -4,6 +4,10 @@
  *
  * \author alistair
  */
+#include "mod_auth.h"
+#include "ap_provider.h"
+#include "http_request.h"
+#include "http_core.h"
 
 #include "httpd.h"
 #include "http_config.h"
@@ -35,6 +39,7 @@ struct mod_guanxi_config {
 	AttributeConsumerService* attributeConsumerService;
 };
 
+// Cookie GUANXI_GUARD_SERVICE_PROVIDER_mod-guanxi-guard=1848109190; GUANXI_IDP_guanxi-localhost-idp_GUANXI_IDP_PROFILE_SHIBBOLETH=-3f3920b3--128721807a7---7f9
 int cookiesCallback(void* data, const char* key, const char* value) {
 	// When we're called, cookieNameOrValue will hold the name of the cookie to look for
 	char* cookieNameOrValue = (char*)data;
@@ -146,10 +151,77 @@ static int mod_guanxi_method_handler(request_rec* r)
 	return OK;
 }
 
+
+
+
+
+/*
+authz_guanxi_check_user_id
+authz_guanxi_auth_checker
+authz_guanxi_check_user_id
+authz_guanxi_auth_checker
+*/
+
+
+static authn_status authn_guanxi_check_password(request_rec *r, const char *user, const char *password) {
+	return AUTH_GRANTED;
+}
+
+static int authz_guanxi_auth_checker(request_rec *r) {
+	fprintf(stderr, "authz_guanxi_auth_checker\n");
+	fprintf(stderr, "ap_auth_type = %s\n", r->ap_auth_type);
+	fflush(stderr);
+
+	return OK;
+}
+
+// redirect here
+// assertions here
+static int authz_guanxi_check_user_id(request_rec *r) {
+	fprintf(stderr, "authz_guanxi_check_user_id\n");
+	fflush(stderr);
+
+	r->ap_auth_type = "guanxi";
+	r->user = "testuser";
+	apr_table_set(r->headers_in, "REMOTE_USER", "testuser");
+
+
+	const apr_array_header_t *reqs_arr = ap_requires(r);
+	require_line* reqs = (require_line*)reqs_arr->elts;
+	for (int x=0; x<reqs_arr->nelts; x++) {
+		fprintf(stderr, "req, %s\n", reqs[x].requirement);
+		fflush(stderr);
+	}
+
+	return OK;
+}
+
+static int authz_guanxi_access_checker(request_rec *r) {
+	fprintf(stderr, "authz_guanxi_access_checker\n");
+	fflush(stderr);
+
+	return OK;
+}
+
+
+static const authn_provider authn_guanxi_provider = {
+    &authn_guanxi_check_password,
+};
+
 static void mod_guanxi_register_hooks(apr_pool_t* p)
 {
-	ap_hook_handler(mod_guanxi_method_handler, NULL, NULL, APR_HOOK_LAST);
+//  ap_register_provider(p, AUTHN_PROVIDER_GROUP, "guanxi", "0", &authn_guanxi_provider);
+	ap_hook_check_user_id(authz_guanxi_check_user_id, NULL, NULL, APR_HOOK_MIDDLE);
+  ap_hook_auth_checker(authz_guanxi_auth_checker, NULL, NULL, APR_HOOK_FIRST);
+//  ap_hook_access_checker(authz_guanxi_access_checker, NULL, NULL, APR_HOOK_MIDDLE);
+//  ap_hook_handler(mod_guanxi_method_handler, NULL, NULL, APR_HOOK_LAST);
 }
+
+
+
+
+
+
 
 static void *create_mod_guanxi_config(apr_pool_t* p, server_rec* s)
 {
